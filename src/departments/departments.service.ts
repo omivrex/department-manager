@@ -1,6 +1,6 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { CreateDepartmentInput } from "../dtos/create-department-input.dto";
+import { CreateDepartmentInput, UpdateDepartmentInput } from "../dtos/department-input.dto";
 import { DepartmentEntity, SubDepartmentEntity } from "../entities/department.entity";
 import { Repository } from "typeorm";
 
@@ -30,5 +30,38 @@ export class DepartmentService {
         }
 
         return await this.deptRepository.save(department);
+    }
+
+    async updateDepartment(id: number, input: UpdateDepartmentInput): Promise<DepartmentEntity> {
+        const { name } = input;
+
+        const department = await this.deptRepository.findOne({ where: { id: id } });
+        if (!department) {
+            throw new NotFoundException(`Department with ID ${id} not found.`);
+        }
+
+        const deptWithSameName = await this.deptRepository.count({
+            where: { name: name.toLowerCase() },
+        });
+
+        if (deptWithSameName > 1) {
+            throw new ConflictException(`A department with the name "${name}" already exists.`);
+        }
+
+        department.name = name.toLowerCase();
+        return await this.deptRepository.save(department);
+    }
+
+    async deleteDepartment(id: number): Promise<boolean> {
+        const department = await this.deptRepository.findOne({ where: { id } });
+        if (!department) {
+            throw new NotFoundException(`Department with ID ${id} not found.`);
+        }
+
+        await this.subDeptRepository.delete({ department: { id } });
+
+        await this.deptRepository.delete(id);
+
+        return true;
     }
 }

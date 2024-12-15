@@ -15,10 +15,17 @@ export class CreateDepartmentInput {
     @MinLength(2, { message: "Department name must be at least 2 characters long" })
     name: string;
 
-    @Field(() => [CreateSubDepartmentInput], { nullable: true }) // Allow null for subDepartments
+    @Field(() => [CreateSubDepartmentInput], { nullable: true })
     @IsArray()
     @ValidateNested({ each: true })
-    @Type(() => CreateSubDepartmentInput) // Required for ValidateNested to work with nested objects
-    @IsOptional() // Allows the field to be omitted or set as null
+    @Type(() => CreateSubDepartmentInput)
+    @IsOptional()
     subDepartments?: CreateSubDepartmentInput[] | null;
+}
+
+@InputType()
+export class UpdateDepartmentInput {
+    @Field()
+    @MinLength(2, { message: "Department name must be at least 2 characters long" })
+    name: string;
 }
