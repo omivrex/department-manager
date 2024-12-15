@@ -33,15 +33,7 @@ This project provides a GraphQL API for managing departments and sub-departments
 
 3. Set up a PostgreSQL database. The `.env` file containing necessary credentials (e.g., database configuration, JWT secret) will be sent via email.
 
-4. Run database migrations:
-
-    ```bash
-    npm run typeorm:migration:run
-    # or
-    yarn typeorm:migration:run
-    ```
-
-5. Start the development server:
+4. Start the development server:
 
     ```bash
     npm run start:dev
@@ -49,7 +41,7 @@ This project provides a GraphQL API for managing departments and sub-departments
     yarn start:dev
     ```
 
-6. Access the API via the GraphQL Playground at: [https://department-manager-46pc.onrender.com/graphql](https://department-manager-46pc.onrender.com/graphql).
+5. Access the API via the GraphQL Playground at: [https://department-manager-46pc.onrender.com/graphql](https://department-manager-46pc.onrender.com/graphql).
 
 ---
 
