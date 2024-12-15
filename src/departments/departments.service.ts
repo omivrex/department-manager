@@ -130,9 +130,6 @@ export class DepartmentService {
         const existingSubDepartment = await this.subDeptRepository.count({
             where: { name: name.toLowerCase(), departmentId: subDepartment.departmentId },
         });
-        console.log("====================================");
-        console.log(existingSubDepartment);
-        console.log("====================================");
         if (existingSubDepartment > 0) {
             throw new Error(`Sub-department with name "${name}" already exists in this department.`);
         }
