@@ -1,5 +1,5 @@
 import { InputType, Field } from "@nestjs/graphql";
-import { MinLength, ValidateNested } from "class-validator";
+import { IsArray, IsOptional, MinLength, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 @InputType()
@@ -15,8 +15,10 @@ export class CreateDepartmentInput {
     @MinLength(2, { message: "Department name must be at least 2 characters long" })
     name: string;
 
-    @Field(() => [CreateSubDepartmentInput], { nullable: true })
+    @Field(() => [CreateSubDepartmentInput], { nullable: true }) // Allow null for subDepartments
+    @IsArray()
     @ValidateNested({ each: true })
-    @Type(() => CreateSubDepartmentInput)
-    subDepartments?: CreateSubDepartmentInput[];
+    @Type(() => CreateSubDepartmentInput) // Required for ValidateNested to work with nested objects
+    @IsOptional() // Allows the field to be omitted or set as null
+    subDepartments?: CreateSubDepartmentInput[] | null;
 }

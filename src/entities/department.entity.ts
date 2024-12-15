@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from "typeorm";
 import { ObjectType, Field } from "@nestjs/graphql";
+import { MinLength } from "class-validator";
 
 @Entity("departments")
 @ObjectType()
@@ -8,7 +9,8 @@ export class DepartmentEntity {
     @Field()
     id: number;
 
-    @Column()
+    @Column({ unique: true })
+    @MinLength(2, { message: "Department name must be at least 2 characters long" })
     @Field()
     name: string;
 
@@ -24,7 +26,8 @@ export class SubDepartmentEntity {
     @Field()
     id: string;
 
-    @Column()
+    @Column({ unique: true })
+    @MinLength(2, { message: "Sub-department name must be at least 2 characters long" })
     @Field()
     name: string;
 
