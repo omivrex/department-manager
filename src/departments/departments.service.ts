@@ -16,17 +16,29 @@ export class DepartmentService {
     async createDepartment(input: CreateDepartmentInput): Promise<DepartmentEntity> {
         const { name, subDepartments } = input;
 
-        const existingDepartment = await this.deptRepository.findOne({ where: { name } });
+        const existingDepartment = await this.deptRepository.findOne({
+            where: { name: name.toLowerCase() },
+        });
+
         if (existingDepartment) {
-            throw new ConflictException(`A department with the name "${name}" already exists.`);
+            throw new Error("A department with this name already exists.");
         }
 
+        // Create the department
         const department = this.deptRepository.create({ name: name.toLowerCase() });
 
-        if (subDepartments && subDepartments.length > 0) {
+        // ensure no two sub departments has thesame name under 1 dept
+        if (subDepartments) {
+            const uniqueSubDeptNames = new Set();
+            subDepartments.forEach((subDept) => {
+                const lowerCasedName = subDept.name.toLowerCase();
+                if (uniqueSubDeptNames.has(lowerCasedName)) {
+                    throw new Error(`Sub-department names must be unique within the same department. Duplicate found: ${subDept.name}`);
+                }
+                uniqueSubDeptNames.add(lowerCasedName);
+            });
+
             department.subDepartments = subDepartments.map((subDept) => this.subDeptRepository.create({ name: subDept.name.toLowerCase() }));
-        } else {
-            department.subDepartments = []; // Ensure subDepartments is initialized as an empty array
         }
 
         return await this.deptRepository.save(department);
@@ -113,6 +125,18 @@ export class DepartmentService {
         if (!subDepartment) {
             throw new NotFoundException(`Sub-department with ID ${subDepartmentId} not found.`);
         }
+
+        // check if a sub-department already has that name
+        const existingSubDepartment = await this.subDeptRepository.count({
+            where: { name: name.toLowerCase(), departmentId: subDepartment.departmentId },
+        });
+        console.log("====================================");
+        console.log(existingSubDepartment);
+        console.log("====================================");
+        if (existingSubDepartment > 0) {
+            throw new Error(`Sub-department with name "${name}" already exists in this department.`);
+        }
+
         subDepartment.name = name.toLowerCase();
         return await this.subDeptRepository.save(subDepartment);
     }

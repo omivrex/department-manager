@@ -34,4 +34,7 @@ export class SubDepartmentEntity {
     @ManyToOne(() => DepartmentEntity, (department) => department.subDepartments)
     @Field(() => DepartmentEntity)
     department: DepartmentEntity;
+
+    @Column()
+    departmentId: number;
 }
