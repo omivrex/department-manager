@@ -65,6 +65,30 @@ export class DepartmentService {
         return true;
     }
 
+    async getDepartments(page: number, limit: number, id?: number): Promise<DepartmentEntity[]> {
+        if (id) {
+            const department = await this.deptRepository.findOne({
+                where: { id },
+                relations: ["subDepartments"],
+            });
+
+            if (!department) {
+                throw new NotFoundException(`Department with ID ${id} not found.`);
+            }
+            return [department]; // Wrap in an array to match the return type
+        }
+
+        page = page >= 1 ? page : 1;
+        const skip = (page - 1) * limit;
+
+        return this.deptRepository.find({
+            relations: ["subDepartments"],
+            skip,
+            take: limit,
+            order: { id: "ASC" },
+        });
+    }
+
     async createSubDepartment(departmentId: number, input: CreateSubDepartmentInput): Promise<SubDepartmentEntity> {
         const { name } = input;
         const department = await this.deptRepository.findOne({ where: { id: departmentId } });
@@ -101,5 +125,36 @@ export class DepartmentService {
 
         await this.subDeptRepository.delete(subDepartmentId);
         return true;
+    }
+
+    async getSubDepartments(departmentId: number, id?: number, page?: number, limit?: number): Promise<SubDepartmentEntity[]> {
+        if (id) {
+            const subDepartment = await this.subDeptRepository.findOne({ where: { id } });
+
+            if (!subDepartment) {
+                throw new NotFoundException(`Sub-department with ID ${id} not found.`);
+            }
+            return [subDepartment]; // Wrap in an array to match the return type
+        }
+
+        page = page >= 1 ? page : 1;
+        const queryBuilder = this.subDeptRepository.createQueryBuilder("subDepartment");
+
+        if (departmentId) {
+            queryBuilder.where("subDepartment.departmentId = :departmentId", { departmentId });
+        }
+
+        queryBuilder
+            .skip((page - 1) * limit)
+            .take(limit)
+            .orderBy("subDepartment.id", "ASC");
+
+        const subDepartments = await queryBuilder.getMany();
+
+        if (!subDepartments.length && departmentId) {
+            throw new NotFoundException(`No sub-departments found for department ID ${departmentId}.`);
+        }
+
+        return subDepartments;
     }
 }

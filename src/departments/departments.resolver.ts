@@ -25,9 +25,13 @@ export class DepartmentResolver {
         return this.departmentService.deleteDepartment(id);
     }
 
-    @Query(() => DepartmentEntity)
+    @Query(() => [DepartmentEntity])
     @UseGuards(JwtAuthGuard)
-    async getDepartment() {
-        return [];
+    async getDepartments(
+        @Args("id", { type: () => Number, nullable: true }) id?: number,
+        @Args("page", { type: () => Number, nullable: true }) page = 1,
+        @Args("limit", { type: () => Number, nullable: true }) limit = 10,
+    ): Promise<DepartmentEntity[]> {
+        return this.departmentService.getDepartments(page, limit, id);
     }
 }

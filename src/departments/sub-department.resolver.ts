@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from "@nestjs/graphql";
+import { Args, Mutation, Resolver, Query } from "@nestjs/graphql";
 import { SubDepartmentEntity } from "src/entities/department.entity";
 import { DepartmentService } from "./departments.service";
 import { JwtAuthGuard } from "src/guards/auth.guard";
@@ -25,5 +25,16 @@ export class SubDepartmentResolver {
     @UseGuards(JwtAuthGuard)
     async deleteSubDepartment(@Args("id") id: number): Promise<boolean> {
         return this.departmentService.deleteSubDepartment(id);
+    }
+
+    @Query(() => [SubDepartmentEntity])
+    @UseGuards(JwtAuthGuard)
+    async getSubDepartments(
+        @Args("departmentId", { type: () => Number, nullable: true }) departmentId?: number,
+        @Args("id", { type: () => Number, nullable: true }) id?: number,
+        @Args("page", { type: () => Number, nullable: true }) page = 1,
+        @Args("limit", { type: () => Number, nullable: true }) limit = 10,
+    ): Promise<SubDepartmentEntity[]> {
+        return this.departmentService.getSubDepartments(departmentId, id, page, limit);
     }
 }
