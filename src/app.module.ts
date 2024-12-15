@@ -6,7 +6,7 @@ import { AppConfigModule } from "./config/config.module";
 import { DepartmentsModule } from "./departments/departments.module";
 
 @Module({
-    imports: [AuthModule, AppConfigModule, DepartmentsModule],
+    imports: [AuthModule, DepartmentsModule, AppConfigModule],
     controllers: [AppController],
     providers: [AppService],
 })

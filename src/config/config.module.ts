@@ -4,10 +4,12 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserEntity } from "src/entities/user.entity";
-import { DepartmentsResolver } from "src/departments/departments.resolver";
+import { DepartmentEntity, SubDepartmentEntity } from "src/entities/department.entity";
+import { DepartmentsModule } from "src/departments/departments.module";
 
 @Module({
     imports: [
+        DepartmentsModule,
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
             autoSchemaFile: true,
@@ -27,12 +29,10 @@ import { DepartmentsResolver } from "src/departments/departments.resolver";
                 username: configService.get<string>("DB_USERNAME"),
                 password: configService.get<string>("DB_PASSWORD"),
                 database: configService.get<string>("DB_NAME"),
-                entities: [UserEntity],
+                entities: [UserEntity, DepartmentEntity, SubDepartmentEntity],
                 synchronize: true,
             }),
         }),
     ],
-
-    providers: [DepartmentsResolver],
 })
 export class AppConfigModule {}
