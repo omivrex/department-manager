@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { CreateDepartmentInput, UpdateDepartmentInput } from "../dtos/department-input.dto";
+import { CreateDepartmentInput, CreateSubDepartmentInput, UpdateDepartmentInput } from "../dtos/department-input.dto";
 import { DepartmentEntity, SubDepartmentEntity } from "../entities/department.entity";
 import { Repository } from "typeorm";
 
@@ -63,5 +63,23 @@ export class DepartmentService {
         await this.deptRepository.delete(id);
 
         return true;
+    }
+
+    async createSubDepartment(departmentId: number, input: CreateSubDepartmentInput): Promise<SubDepartmentEntity> {
+        const { name } = input;
+        const department = await this.deptRepository.findOne({ where: { id: departmentId } });
+        if (!department) {
+            throw new NotFoundException(`Department with ID ${departmentId} not found.`);
+        }
+
+        const existingSubDept = await this.subDeptRepository.findOne({
+            where: { name: name.toLowerCase(), department: { id: departmentId } },
+        });
+        if (existingSubDept) {
+            throw new ConflictException(`Sub-department with name "${name}" already exists.`);
+        }
+
+        const subDepartment = this.subDeptRepository.create({ name, department: { id: departmentId } });
+        return await this.subDeptRepository.save(subDepartment);
     }
 }
