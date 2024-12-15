@@ -14,8 +14,8 @@ export class AuthResolver {
     }
 
     @Mutation(() => LoginResponse)
-    async login(@Args("email") email: string, @Args("password") password: string, @Context() context: any) {
+    async login(@Args("username") username: string, @Args("password") password: string, @Context() context: any): Promise<LoginResponse> {
         const res = context.res;
-        return this.authService.login(email, password, res);
+        return this.authService.login(username, password, res);
     }
 }

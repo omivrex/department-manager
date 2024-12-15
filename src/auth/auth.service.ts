@@ -51,8 +51,8 @@ export class AuthService {
         return user;
     }
 
-    async login(email: string, password: string, res: any) {
-        const user = await this.validateUser(email, password);
+    async login(username: string, password: string, res: any) {
+        const user = await this.validateUser(username, password);
 
         const accessToken = this.generateAccessToken(user.id, user.email);
         const refreshToken = this.generateRefreshToken(user.id);

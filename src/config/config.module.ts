@@ -4,6 +4,7 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserEntity } from "src/entities/user.entity";
+import { DepartmentsResolver } from "src/departments/departments.resolver";
 
 @Module({
     imports: [
@@ -11,6 +12,8 @@ import { UserEntity } from "src/entities/user.entity";
             driver: ApolloDriver,
             autoSchemaFile: true,
             context: ({ req, res }) => ({ req, res }),
+            playground: true,
+            introspection: true,
         }),
 
         ConfigModule.forRoot({ isGlobal: true }),
@@ -29,5 +32,7 @@ import { UserEntity } from "src/entities/user.entity";
             }),
         }),
     ],
+
+    providers: [DepartmentsResolver],
 })
 export class AppConfigModule {}
