@@ -20,4 +20,10 @@ export class SubDepartmentResolver {
     async updateSubDepartment(@Args("id") id: number, @Args("input") input: UpdateSubDepartmentInput): Promise<SubDepartmentEntity> {
         return this.departmentService.updateSubDepartment(id, input);
     }
+
+    @Mutation(() => Boolean)
+    @UseGuards(JwtAuthGuard)
+    async deleteSubDepartment(@Args("id") id: number): Promise<boolean> {
+        return this.departmentService.deleteSubDepartment(id);
+    }
 }

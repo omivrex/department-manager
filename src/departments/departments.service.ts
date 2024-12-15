@@ -92,4 +92,14 @@ export class DepartmentService {
         subDepartment.name = name.toLowerCase();
         return await this.subDeptRepository.save(subDepartment);
     }
+
+    async deleteSubDepartment(subDepartmentId: number): Promise<boolean> {
+        const subDepartment = await this.subDeptRepository.findOne({ where: { id: subDepartmentId } });
+        if (!subDepartment) {
+            throw new NotFoundException(`Sub-department with ID ${subDepartmentId} not found.`);
+        }
+
+        await this.subDeptRepository.delete(subDepartmentId);
+        return true;
+    }
 }
