@@ -29,3 +29,10 @@ export class UpdateDepartmentInput {
     @MinLength(2, { message: "Department name must be at least 2 characters long" })
     name: string;
 }
+
+@InputType()
+export class UpdateSubDepartmentInput {
+    @Field()
+    @MinLength(2, { message: "Department name must be at least 2 characters long" })
+    name: string;
+}

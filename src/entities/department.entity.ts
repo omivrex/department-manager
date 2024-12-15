@@ -24,7 +24,7 @@ export class DepartmentEntity {
 export class SubDepartmentEntity {
     @PrimaryGeneratedColumn()
     @Field()
-    id: string;
+    id: number;
 
     @Column({ unique: true })
     @MinLength(2, { message: "Sub-department name must be at least 2 characters long" })
