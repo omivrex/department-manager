@@ -19,8 +19,8 @@ This project provides a GraphQL API for managing departments and sub-departments
 1. Clone the repository:
 
     ```bash
-    git clone <repository-url>
-    cd <project-folder>
+    git clone https://github.com/omivrex/department-manager.git
+    cd department-manager
     ```
 
 2. Install dependencies:
