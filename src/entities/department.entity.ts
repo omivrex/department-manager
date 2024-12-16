@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, JoinColumn, ManyToMany, JoinTable } from "typeorm";
 import { ObjectType, Field } from "@nestjs/graphql";
 import { MinLength } from "class-validator";
+import { UserEntity } from "./user.entity";
 
 @Entity("departments")
 @ObjectType()
@@ -17,6 +18,10 @@ export class DepartmentEntity {
     @OneToMany(() => SubDepartmentEntity, (subDepartment) => subDepartment.department, { cascade: true })
     @Field(() => [SubDepartmentEntity], { nullable: true })
     subDepartments?: SubDepartmentEntity[];
+
+    @ManyToOne(() => UserEntity, { eager: true })
+    @JoinColumn({ name: "adminId" })
+    admin: UserEntity;
 }
 
 @Entity("sub_departments")
@@ -37,4 +42,8 @@ export class SubDepartmentEntity {
 
     @Column()
     departmentId: number;
+
+    @ManyToMany(() => UserEntity, { eager: true })
+    @JoinTable({ name: "sub_department_members" })
+    members: UserEntity[];
 }

@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args, Query } from "@nestjs/graphql";
+import { Resolver, Mutation, Args, Query, Context } from "@nestjs/graphql";
 import { DepartmentService } from "./departments.service";
 import { CreateDepartmentInput, UpdateDepartmentInput } from "../dtos/department-input.dto";
 import { DepartmentEntity } from "../entities/department.entity";
@@ -11,8 +11,9 @@ export class DepartmentResolver {
 
     @Mutation(() => DepartmentEntity)
     @UseGuards(JwtAuthGuard)
-    async createDepartment(@Args("input") input: CreateDepartmentInput): Promise<DepartmentEntity> {
-        return this.departmentService.createDepartment(input);
+    async createDepartment(@Context() context, @Args("input") input: CreateDepartmentInput): Promise<DepartmentEntity> {
+        const adminId = context.req.user.sub;
+        return this.departmentService.createDepartment(input, adminId);
     }
     @Mutation(() => DepartmentEntity)
     @UseGuards(JwtAuthGuard)

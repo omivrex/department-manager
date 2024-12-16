@@ -22,7 +22,8 @@ export class JwtAuthGuard implements CanActivate {
         }
 
         try {
-            this.jwtService.verify(accessToken, { secret: process.env.JWT_ACCESS_SECRET });
+            const payload = this.jwtService.verify(accessToken, { secret: process.env.JWT_ACCESS_SECRET });
+            req.user = payload;
             return true;
         } catch (err) {
             if (err.name === "TokenExpiredError" && refreshToken) {

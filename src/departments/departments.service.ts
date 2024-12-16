@@ -2,7 +2,8 @@ import { ConflictException, Injectable, NotFoundException } from "@nestjs/common
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateDepartmentInput, CreateSubDepartmentInput, UpdateDepartmentInput, UpdateSubDepartmentInput } from "../dtos/department-input.dto";
 import { DepartmentEntity, SubDepartmentEntity } from "../entities/department.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
+import { UserEntity } from "src/entities/user.entity";
 
 @Injectable()
 export class DepartmentService {
@@ -11,9 +12,11 @@ export class DepartmentService {
         private subDeptRepository: Repository<SubDepartmentEntity>,
         @InjectRepository(DepartmentEntity)
         private deptRepository: Repository<DepartmentEntity>,
+        @InjectRepository(UserEntity)
+        private userRepository: Repository<UserEntity>,
     ) {}
 
-    async createDepartment(input: CreateDepartmentInput): Promise<DepartmentEntity> {
+    async createDepartment(input: CreateDepartmentInput, adminId: string): Promise<DepartmentEntity> {
         const { name, subDepartments } = input;
 
         const existingDepartment = await this.deptRepository.findOne({
@@ -25,7 +28,7 @@ export class DepartmentService {
         }
 
         // Create the department
-        const department = this.deptRepository.create({ name: name.toLowerCase() });
+        const department = this.deptRepository.create({ name: name.toLowerCase(), admin: { id: adminId } });
 
         // ensure no two sub departments has thesame name under 1 dept
         if (subDepartments) {
@@ -177,5 +180,35 @@ export class DepartmentService {
         }
 
         return subDepartments;
+    }
+
+    async addMembersToSubDepartment(adminId: string, subDepartmentId: number, memberEmails: string[]): Promise<SubDepartmentEntity> {
+        const subDepartment = await this.subDeptRepository.findOne({
+            where: { id: subDepartmentId },
+            relations: ["department", "members"],
+        });
+
+        if (!subDepartment) {
+            throw new NotFoundException(`Sub-department with ID ${subDepartmentId} not found.`);
+        }
+
+        // Check if the admin has permission
+        if (subDepartment.department.admin.id !== adminId) {
+            throw new Error("Only the admin of the department can add members to its sub-departments.");
+        }
+
+        // Fetch users by emails
+        const users = await this.userRepository.find({
+            where: { email: In(memberEmails) },
+        });
+
+        if (users.length !== memberEmails.length) {
+            throw new NotFoundException("Some users were not found.");
+        }
+
+        // Add new members
+        subDepartment.members = Array.from(new Set([...subDepartment.members, ...users]));
+
+        return await this.subDeptRepository.save(subDepartment);
     }
 }
