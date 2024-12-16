@@ -254,6 +254,14 @@ mutation DeleteSubDepartment {
 
 ---
 
+## Extra Features
+
+- Pagination of apis
+- CRUD operations for sub departments
+- Sign up
+- Authorization/admin roles in departments
+- Addition of members to sub departments
+
 ## Additional Notes
 
 - The project uses TypeORM for database management and relationships.
